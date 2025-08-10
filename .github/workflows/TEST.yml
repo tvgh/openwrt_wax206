@@ -1,4 +1,4 @@
-name: TEST_wax206
+name: Release_wax206
 run-name: Release - ${{ inputs.model || 'wax206'}}
 
 on:
@@ -79,14 +79,18 @@ jobs:
         run: |
           echo "===== 检查 feeds.conf ====="
           cat ./feeds.conf || echo "feeds.conf 未找到"
-          echo "===== 检查 feeds.conf.default ====="
+          echo "===== 检查 feeds.conf.default 完整内容 ====="
           cat ./feeds.conf.default || echo "feeds.conf.default 未找到"
+          echo "===== 检查 feeds.conf.default 每行解析 ====="
+          awk '{print "Line " NR ": " $0 " | Feed name: " $2}' ./feeds.conf.default || echo "无法解析 feeds.conf.default"
           echo "===== 检查重复 feed 名称 ====="
-          awk '{print $2}' ./feeds.conf.default | sort | uniq -d || echo "无重复 feed 名称"
-          if awk '{print $2}' ./feeds.conf.default | sort | uniq -d | grep -q .; then
+          awk '/^[^#]/ && NF >= 2 {print $2}' ./feeds.conf.default | sort | uniq -d | tee duplicate_feeds.txt
+          if [ -s duplicate_feeds.txt ]; then
             echo "错误：检测到重复 feed 名称"
-            awk '{print $2}' ./feeds.conf.default | sort | uniq -d
+            cat duplicate_feeds.txt
             exit 1
+          else
+            echo "无重复 feed 名称"
           fi
           echo "===== 检查 config/${MODEL}.config ====="
           cat "$CONFIG_FILE" || echo "配置文件 ${CONFIG_FILE} 未找到"
