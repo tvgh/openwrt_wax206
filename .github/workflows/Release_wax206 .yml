@@ -157,7 +157,7 @@ jobs:
         run: |
           export BASE_PATH=$(pwd)
           cp -f "${CONFIG_FILE}" ./.config
-          make defconfig
+
           make download -j$(($(nproc) * 2))
           make V=s -j$(nproc) || make -j1 V=s
           FIRMWARE_DIR="./firmware"
