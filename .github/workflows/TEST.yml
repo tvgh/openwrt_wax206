@@ -1,4 +1,4 @@
-name: Release_wax206
+name: test_wax206
 run-name: Release - ${{ inputs.model || 'wax206'}}
 
 on:
